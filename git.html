@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git vs GitHub — الدليل التقني الشامل</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #21262d;
+  --border: #30363d;
+  --border2: #21262d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --git: #f05033;
+  --git-dim: #3d1a15;
+  --github: #238636;
+  --github-dim: #122016;
+  --accent: #58a6ff;
+  --accent-dim: #0d2140;
+  --yellow: #d29922;
+  --yellow-dim: #2d2009;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'Tajawal', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.7;
+}
+
+/* ========== SCANLINES OVERLAY ========== */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* ========== HEADER ========== */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.header-bar {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 60px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+.dot-red { background: #ff5f57; }
+.dot-yellow { background: #febc2e; }
+.dot-green { background: #28c840; }
+.bar-path { color: var(--accent); margin-right: 16px; }
+
+.header-content {
+  padding: 60px 60px 50px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 60px;
+  align-items: center;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.header-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-label::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--muted);
+  display: inline-block;
+}
+
+.header-content h1 {
+  font-family: var(--mono);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -1px;
+}
+
+.h1-git { color: var(--git); }
+.h1-vs { color: var(--muted); font-size: 0.7em; }
+.h1-github { color: var(--github); }
+
+.header-desc {
+  margin-top: 20px;
+  font-size: 1.05rem;
+  color: var(--muted);
+  max-width: 500px;
+  font-weight: 300;
+}
+
+.header-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+
+.meta-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 6px 14px;
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+
+.meta-tag.git { background: var(--git-dim); color: var(--git); border: 1px solid #6b2219; }
+.meta-tag.github { background: var(--github-dim); color: var(--github); border: 1px solid #1c5228; }
+.meta-tag.info { background: var(--accent-dim); color: var(--accent); border: 1px solid #1c3d6b; }
+
+.header-visual {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.terminal-mini {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px 20px;
+  font-family: var(--mono);
+  font-size: 13px;
+  min-width: 280px;
+}
+
+.tm-line { display: flex; gap: 8px; margin-bottom: 4px; align-items: baseline; }
+.tm-prompt { color: var(--github); }
+.tm-cmd { color: var(--text); }
+.tm-comment { color: var(--muted); }
+.tm-out { color: var(--accent); padding-right: 16px; }
+.tm-out2 { color: var(--yellow); padding-right: 16px; }
+
+/* ========== NAV ========== */
+nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-inner {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 60px;
+  display: flex;
+  overflow-x: auto;
+}
+
+nav a {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 14px 20px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+nav a:hover {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+/* ========== PAGE LAYOUT ========== */
+.page {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 60px;
+}
+
+/* ========== SECTION HEADER ========== */
+.sec-head {
+  padding: 60px 0 36px;
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  border-bottom: 1px solid var(--border2);
+  margin-bottom: 40px;
+}
+
+.sec-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 2px;
+}
+
+.sec-head h2 {
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+
+/* ========== SPLIT DEFINITION ========== */
+.split-def {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: var(--border2);
+  margin-bottom: 50px;
+}
+
+.def-col {
+  background: var(--surface);
+  padding: 40px;
+}
+
+.def-col-git { border-top: 3px solid var(--git); }
+.def-col-github { border-top: 3px solid var(--github); }
+
+.def-logo {
+  font-family: var(--mono);
+  font-size: 2.2rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.def-logo-git { color: var(--git); }
+.def-logo-github { color: var(--github); }
+
+.def-subtitle {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.def-body {
+  font-size: 0.98rem;
+  color: #b1bac4;
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+
+.def-analogy {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-right: 3px solid;
+  padding: 16px 20px;
+  border-radius: 2px;
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+.def-col-git .def-analogy { border-right-color: var(--git); }
+.def-col-github .def-analogy { border-right-color: var(--github); }
+
+.def-analogy strong { color: var(--text); }
+
+.def-props {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--border2);
+}
+
+.def-prop {
+  background: var(--surface2);
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+}
+
+.prop-key {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+}
+
+.prop-val { color: var(--text); font-weight: 500; text-align: left; }
+.prop-val.yes { color: var(--github); }
+.prop-val.no { color: var(--git); }
+.prop-val.partial { color: var(--yellow); }
+
+/* ========== COMPARISON TABLE ========== */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 50px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.cmp-table thead tr {
+  background: var(--surface2);
+}
+
+.cmp-table th {
+  padding: 16px 24px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 600;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+
+.cmp-table th:nth-child(2) { color: var(--git); }
+.cmp-table th:nth-child(3) { color: var(--github); }
+.cmp-table th:first-child { color: var(--muted); }
+
+.cmp-table td {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border2);
+  font-size: 0.9rem;
+  vertical-align: top;
+  line-height: 1.65;
+  color: #b1bac4;
+}
+
+.cmp-table tr:last-child td { border-bottom: none; }
+
+.cmp-table td:first-child {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  background: var(--surface2);
+  white-space: nowrap;
+}
+
+.cmp-table tr:hover td { background: #1c2128; }
+.cmp-table tr:hover td:first-child { background: #1c2128; }
+
+code {
+  font-family: var(--mono);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 2px;
+  font-size: 0.82em;
+  color: var(--accent);
+}
+
+/* ========== WORKFLOW ========== */
+.workflow-wrap {
+  margin-bottom: 50px;
+}
+
+.wf-grid {
+  display: grid;
+  grid-template-columns: 1fr 40px 1fr;
+  gap: 0;
+  align-items: start;
+}
+
+.wf-col {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.wf-col-header {
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wf-col-git .wf-col-header { color: var(--git); background: var(--git-dim); }
+.wf-col-github .wf-col-header { color: var(--github); background: var(--github-dim); }
+
+.wf-steps {
+  list-style: none;
+  padding: 0;
+}
+
+.wf-step {
+  padding: 16px 28px;
+  border-bottom: 1px solid var(--border2);
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.wf-step:last-child { border-bottom: none; }
+
+.wf-step-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--border);
+  line-height: 1.6;
+  text-align: center;
+}
+
+.wf-step-body {}
+
+.wf-step-cmd {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.wf-step-desc {
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.wf-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 60px;
+  font-size: 1.2rem;
+  color: var(--border);
+}
+
+/* ========== CONCEPTS GRID ========== */
+.concepts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: var(--border2);
+  margin-bottom: 50px;
+}
+
+.concept-card {
+  background: var(--surface);
+  padding: 28px;
+  transition: background 0.2s;
+}
+
+.concept-card:hover { background: var(--surface2); }
+
+.concept-term {
+  font-family: var(--mono);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+.concept-ar {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 14px;
+  font-family: var(--mono);
+}
+
+.concept-desc {
+  font-size: 0.88rem;
+  color: #8b949e;
+  line-height: 1.7;
+}
+
+.concept-example {
+  margin-top: 12px;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--yellow);
+  background: var(--yellow-dim);
+  border: 1px solid #4a3800;
+  padding: 6px 12px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+/* ========== COMMANDS SECTION ========== */
+.commands-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: var(--border2);
+  margin-bottom: 50px;
+}
+
+.cmd-panel {
+  background: var(--surface);
+}
+
+.cmd-panel-header {
+  padding: 18px 28px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.cmd-panel-git .cmd-panel-header { color: var(--git); }
+.cmd-panel-github .cmd-panel-header { color: var(--github); }
+
+.cmd-list {
+  list-style: none;
+  padding: 0;
+}
+
+.cmd-item {
+  padding: 14px 28px;
+  border-bottom: 1px solid var(--border2);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 20px;
+  align-items: baseline;
+}
+
+.cmd-item:last-child { border-bottom: none; }
+
+.cmd-code {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--accent);
+  white-space: nowrap;
+  direction: ltr;
+}
+
+.cmd-desc {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* ========== USE CASES ========== */
+.usecases-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+  background: var(--border2);
+  margin-bottom: 50px;
+}
+
+.usecase {
+  background: var(--surface);
+  padding: 28px;
+}
+
+.usecase-q {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.usecase-q::before {
+  content: '؟';
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--yellow);
+  background: var(--yellow-dim);
+  border: 1px solid #4a3800;
+  width: 22px;
+  height: 22px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.usecase-a {
+  font-size: 0.87rem;
+  color: var(--muted);
+  line-height: 1.7;
+  padding-right: 32px;
+}
+
+.usecase-a strong { color: var(--text); }
+
+.answer-git { border-top: 2px solid var(--git); }
+.answer-github { border-top: 2px solid var(--github); }
+.answer-both { border-top: 2px solid var(--accent); }
+
+/* ========== CALLOUT ========== */
+.callout {
+  background: var(--accent-dim);
+  border: 1px solid #1c3d6b;
+  border-right: 3px solid var(--accent);
+  padding: 24px 28px;
+  margin-bottom: 50px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.callout-icon {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--accent);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: var(--accent-dim);
+  border: 1px solid #1c3d6b;
+  padding: 6px 12px;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.callout-text {
+  font-size: 0.92rem;
+  color: #b1bac4;
+  line-height: 1.75;
+}
+
+.callout-text strong { color: var(--text); }
+
+/* ========== RESOURCES ========== */
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: var(--border2);
+  margin-bottom: 50px;
+}
+
+.res-card {
+  background: var(--surface);
+  padding: 28px;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: background 0.2s;
+  border-top: 2px solid var(--border2);
+}
+
+.res-card:hover { background: var(--surface2); border-top-color: var(--accent); }
+
+.res-name {
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.res-desc {
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+
+.res-tag {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 3px 10px;
+  border-radius: 2px;
+  letter-spacing: 0.5px;
+}
+
+/* ========== FOOTER ========== */
+footer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 40px 60px;
+  margin-top: 60px;
+}
+
+.footer-inner {
+  max-width: 1300px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+}
+
+.footer-left {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.footer-left span { color: var(--git); }
+.footer-left span.gh { color: var(--github); }
+
+.footer-right {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--border);
+  text-align: left;
+  letter-spacing: 1px;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 1100px) {
+  .header-content, .page, footer { padding-left: 30px; padding-right: 30px; }
+  .nav-inner { padding: 0 30px; }
+  .header-content { grid-template-columns: 1fr; }
+  .concepts-grid { grid-template-columns: repeat(2, 1fr); }
+  .resources-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .header-bar { padding: 10px 20px; }
+  .header-content { padding: 40px 20px 36px; gap: 30px; }
+  .split-def { grid-template-columns: 1fr; }
+  .commands-wrap, .usecases-grid { grid-template-columns: 1fr; }
+  .wf-grid { grid-template-columns: 1fr; }
+  .wf-arrow { display: none; }
+  .concepts-grid, .resources-grid { grid-template-columns: 1fr; }
+  .footer-inner { flex-direction: column; align-items: flex-start; }
+}
+
+/* ========== ANIMATIONS ========== */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.cursor {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  background: var(--accent);
+  animation: blink 1s step-end infinite;
+  vertical-align: text-bottom;
+  margin-right: 2px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-bar">
+    <span class="dot dot-red"></span>
+    <span class="dot dot-yellow"></span>
+    <span class="dot dot-green"></span>
+    <span class="bar-path">~/dev/git-vs-github</span>
+    <span>— الدليل التقني الشامل</span>
+  </div>
+  <div class="header-content">
+    <div>
+      <div class="header-label">دليل مرجعي تقني · 2025</div>
+      <h1>
+        <span class="h1-git">Git</span>
+        <span class="h1-vs"> vs </span>
+        <span class="h1-github">GitHub</span>
+        <span class="cursor"></span>
+      </h1>
+      <p class="header-desc">
+        الفرق الجوهري بين الأداة والمنصة — فهم عميق للمفاهيم والأوامر والاستخدامات الصحيحة لكل منهما
+      </p>
+      <div class="header-meta">
+        <span class="meta-tag git">Version Control</span>
+        <span class="meta-tag github">Cloud Hosting</span>
+        <span class="meta-tag info">Collaboration</span>
+      </div>
+    </div>
+    <div class="header-visual">
+      <div class="terminal-mini">
+        <div class="tm-line">
+          <span class="tm-prompt">$</span>
+          <span class="tm-cmd">git --version</span>
+        </div>
+        <div class="tm-line">
+          <span class="tm-out">git version 2.44.0</span>
+        </div>
+        <div class="tm-line" style="margin-top:8px;">
+          <span class="tm-prompt">$</span>
+          <span class="tm-cmd">git init my-project</span>
+        </div>
+        <div class="tm-line">
+          <span class="tm-out">Initialized empty Git repository</span>
+        </div>
+        <div class="tm-line" style="margin-top:8px;">
+          <span class="tm-prompt">$</span>
+          <span class="tm-cmd">git remote add origin</span>
+        </div>
+        <div class="tm-line">
+          <span class="tm-comment"># ← هنا يدخل GitHub</span>
+        </div>
+        <div class="tm-line">
+          <span class="tm-out2">github.com/user/my-project.git</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#definition">التعريف</a>
+    <a href="#comparison">المقارنة</a>
+    <a href="#concepts">المصطلحات</a>
+    <a href="#workflow">سير العمل</a>
+    <a href="#commands">الأوامر</a>
+    <a href="#usecases">متى تستخدم</a>
+    <a href="#resources">المصادر</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- ===== DEFINITION ===== -->
+  <section id="definition">
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <h2>التعريف الجوهري</h2>
+    </div>
+
+    <div class="split-def">
+      <div class="def-col def-col-git">
+        <div class="def-logo def-logo-git">Git</div>
+        <div class="def-subtitle">Version Control System · أداة محلية</div>
+        <p class="def-body">
+          Git هي أداة سطر أوامر (CLI) تُنصَّب على جهازك المحلي. وظيفتها الوحيدة هي تتبع تغييرات الكود عبر الزمن — تحفظ لقطات (snapshots) من مشروعك في كل مرحلة، مما يتيح لك العودة لأي نسخة سابقة، إنشاء فروع مستقلة للتجربة، ودمج التعديلات من عدة مطورين.
+        </p>
+        <div class="def-analogy">
+          <strong>التشبيه:</strong> Git كمحرك السيارة — يعمل على جهازك دون أن يعلم به أحد. لا يحتاج إنترنت، ولا خوادم خارجية.
+        </div>
+        <div class="def-props">
+          <div class="def-prop">
+            <span class="prop-key">النوع</span>
+            <span class="prop-val">أداة CLI مفتوحة المصدر</span>
+          </div>
+          <div class="def-prop">
+            <span class="prop-key">يعمل بدون إنترنت</span>
+            <span class="prop-val yes">✓ نعم</span>
+          </div>
+          <div class="def-prop">
+            <span class="prop-key">يُنصَّب على</span>
+            <span class="prop-val">جهازك المحلي</span>
+          </div>
+          <div class="def-prop">
+            <span class="prop-key">صاحبه</span>
+            <span class="prop-val">Linus Torvalds · 2005</span>
+          </div>
+          <div class="def-prop">
+            <span class="prop-key">البديل</span>
+            <span class="prop-val partial">SVN · Mercurial · Perforce</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="def-col def-col-github">
+        <div class="def-logo def-logo-github">GitHub</div>
+        <div class="def-subtitle">Cloud Hosting Platform · منصة سحابية</div>
+        <p class="def-body">
+          GitHub هي منصة ويب تستضيف مستودعات Git على السحابة. تُضيف فوقها طبقة اجتماعية وتعاونية: Pull Requests للمراجعة، Issues لتتبع المشكلات، Actions للـ CI/CD، وصفحات لنشر المواقع. هي تستخدم Git خلف الكواليس لكنها ليست Git.
+        </p>
+        <div class="def-analogy">
+          <strong>التشبيه:</strong> GitHub كمنصة YouTube — كما أن YouTube يستضيف فيديوهاتك ويتيح مشاركتها، GitHub يستضيف كودك ويتيح التعاون فيه.
+        </div>
+        <div class="def-props">
+          <div class="def-prop">
+            <span class="prop-key">النوع</span>
+            <span class="prop-val">منصة SaaS (مملوكة لـ Microsoft)</span>
+          </div>
+          <div class="def-prop">
+            <span class="prop-key">يعمل بدون إنترنت</span>
+            <span class="prop-val no">✗ لا</span>
+          </div>
+          <div class="def-prop">
+            <span class="prop-key">تعمل عبر</span>
+            <span class="prop-val">المتصفح + git CLI</span>
+          </div>
+          <div class="def-prop">
+            <span class="prop-key">أُسست</span>
+            <span class="prop-val">2008 · اشترتها Microsoft 2018</span>
+          </div>
+          <div class="def-prop">
+            <span class="prop-key">البديل</span>
+            <span class="prop-val partial">GitLab · Bitbucket · Gitea</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COMPARISON ===== -->
+  <section id="comparison">
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <h2>مقارنة تفصيلية</h2>
+    </div>
+
+    <div class="callout">
+      <span class="callout-icon">ملاحظة أساسية</span>
+      <div class="callout-text">
+        يمكنك استخدام <strong>Git دون GitHub</strong> تماماً — تتبع كودك محلياً دون رفعه لأي مكان. لكن لا يمكنك استخدام <strong>GitHub دون Git</strong> — المنصة تعتمد كلياً على Git كمحرك خلفي. الخلط بينهما خطأ شائع يقع فيه كثير من المبتدئين.
+      </div>
+    </div>
+
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th>المحور</th>
+          <th>Git</th>
+          <th>GitHub</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>الماهية</td>
+          <td>نظام التحكم بالإصدار <code>VCS</code> — الأداة ذاتها</td>
+          <td>منصة استضافة تستخدم <code>Git</code> كمحرك</td>
+        </tr>
+        <tr>
+          <td>مكان التشغيل</td>
+          <td>جهازك المحلي <code>local machine</code></td>
+          <td>خوادم سحابية <code>cloud servers</code></td>
+        </tr>
+        <tr>
+          <td>الاتصال بالإنترنت</td>
+          <td>غير مطلوب للعمليات المحلية</td>
+          <td>مطلوب دائماً للوصول والتزامن</td>
+        </tr>
+        <tr>
+          <td>واجهة المستخدم</td>
+          <td>سطر الأوامر <code>CLI</code> بشكل أساسي</td>
+          <td>واجهة ويب + سطر أوامر معاً</td>
+        </tr>
+        <tr>
+          <td>التعاون</td>
+          <td>ممكن لكن معقد بدون منصة</td>
+          <td>مصمم خصيصاً للتعاون — <code>PR + Review</code></td>
+        </tr>
+        <tr>
+          <td>الأتمتة</td>
+          <td>يحتاج أدوات خارجية للـ <code>CI/CD</code></td>
+          <td>GitHub Actions مدمج بالكامل</td>
+        </tr>
+        <tr>
+          <td>إدارة المشاريع</td>
+          <td>لا توجد — مجرد VCS</td>
+          <td>Issues، Projects، Milestones، Wiki</td>
+        </tr>
+        <tr>
+          <td>نشر المواقع</td>
+          <td>لا توجد</td>
+          <td>GitHub Pages مجاناً للمستودعات العامة</td>
+        </tr>
+        <tr>
+          <td>الترخيص</td>
+          <td>مفتوح المصدر بالكامل <code>GPL-2.0</code></td>
+          <td>مملوك + خطة مجانية محدودة</td>
+        </tr>
+        <tr>
+          <td>البدائل</td>
+          <td>SVN · Mercurial · Perforce</td>
+          <td>GitLab · Bitbucket · Azure DevOps</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===== CONCEPTS ===== -->
+  <section id="concepts">
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <h2>المصطلحات الأساسية</h2>
+    </div>
+
+    <div class="concepts-grid">
+      <div class="concept-card">
+        <div class="concept-term">Repository</div>
+        <div class="concept-ar">مستودع · ريبو</div>
+        <div class="concept-desc">مجلد المشروع بكامل تاريخه. يحوي كل الملفات وكل التعديلات منذ بداية المشروع.</div>
+        <span class="concept-example">git init / git clone</span>
+      </div>
+      <div class="concept-card">
+        <div class="concept-term">Commit</div>
+        <div class="concept-ar">نقطة حفظ · لقطة</div>
+        <div class="concept-desc">تسجيل رسمي لتغييرات معينة مع رسالة وصفية وختم زمني وهوية المؤلف.</div>
+        <span class="concept-example">git commit -m "..."</span>
+      </div>
+      <div class="concept-card">
+        <div class="concept-term">Branch</div>
+        <div class="concept-ar">فرع · مسار مستقل</div>
+        <div class="concept-desc">نسخة مستقلة من المشروع تُتيح العمل على ميزة دون التأثير على الكود الرئيسي.</div>
+        <span class="concept-example">git checkout -b feature</span>
+      </div>
+      <div class="concept-card">
+        <div class="concept-term">Merge</div>
+        <div class="concept-ar">دمج · إدماج</div>
+        <div class="concept-desc">دمج تغييرات فرع في فرع آخر. قد ينتج عنه تعارضات تحتاج حلاً يدوياً.</div>
+        <span class="concept-example">git merge feature-branch</span>
+      </div>
+      <div class="concept-card">
+        <div class="concept-term">Pull Request</div>
+        <div class="concept-ar">طلب دمج · خاص بـ GitHub</div>
+        <div class="concept-desc">طلب رسمي لدمج كودك في الفرع الرئيسي. يتضمن مراجعة من زملائك والموافقة.</div>
+        <span class="concept-example">GitHub UI → New PR</span>
+      </div>
+      <div class="concept-card">
+        <div class="concept-term">Fork</div>
+        <div class="concept-ar">نسخة مستقلة · تفرع</div>
+        <div class="concept-desc">نسخ مستودع شخص آخر لحسابك الخاص للعمل عليه بحرية دون التأثير على الأصل.</div>
+        <span class="concept-example">GitHub UI → Fork</span>
+      </div>
+      <div class="concept-card">
+        <div class="concept-term">Clone</div>
+        <div class="concept-ar">استنساخ محلي</div>
+        <div class="concept-desc">تحميل نسخة كاملة من مستودع بعيد (GitHub) لجهازك المحلي بكل تاريخه.</div>
+        <span class="concept-example">git clone [url]</span>
+      </div>
+      <div class="concept-card">
+        <div class="concept-term">Push / Pull</div>
+        <div class="concept-ar">رفع / سحب</div>
+        <div class="concept-desc">Push: رفع commits المحلية للمستودع البعيد. Pull: تحديث النسخة المحلية بآخر التغييرات.</div>
+        <span class="concept-example">git push origin main</span>
+      </div>
+      <div class="concept-card">
+        <div class="concept-term">Staging Area</div>
+        <div class="concept-ar">منطقة التحضير</div>
+        <div class="concept-desc">منطقة وسطى بين التعديل والـ commit. تختار فيها أي الملفات ستُضمَّن في الـ commit القادم.</div>
+        <span class="concept-example">git add .</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== WORKFLOW ===== -->
+  <section id="workflow">
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <h2>سير عمل نموذجي</h2>
+    </div>
+
+    <div class="workflow-wrap">
+      <div class="wf-grid">
+        <div class="wf-col wf-col-git">
+          <div class="wf-col-header">⬡ Git — على جهازك</div>
+          <ul class="wf-steps">
+            <li class="wf-step">
+              <span class="wf-step-num">01</span>
+              <div class="wf-step-body">
+                <div class="wf-step-cmd">git init</div>
+                <div class="wf-step-desc">تهيئة مستودع جديد في المجلد الحالي</div>
+              </div>
+            </li>
+            <li class="wf-step">
+              <span class="wf-step-num">02</span>
+              <div class="wf-step-body">
+                <div class="wf-step-cmd">git add .</div>
+                <div class="wf-step-desc">إضافة التغييرات إلى منطقة التحضير</div>
+              </div>
+            </li>
+            <li class="wf-step">
+              <span class="wf-step-num">03</span>
+              <div class="wf-step-body">
+                <div class="wf-step-cmd">git commit -m "feat: add login"</div>
+                <div class="wf-step-desc">تسجيل التغييرات كـ commit بمحلي</div>
+              </div>
+            </li>
+            <li class="wf-step">
+              <span class="wf-step-num">04</span>
+              <div class="wf-step-body">
+                <div class="wf-step-cmd">git checkout -b feature/auth</div>
+                <div class="wf-step-desc">إنشاء فرع جديد للعمل على ميزة مستقلة</div>
+              </div>
+            </li>
+            <li class="wf-step">
+              <span class="wf-step-num">05</span>
+              <div class="wf-step-body">
+                <div class="wf-step-cmd">git merge main</div>
+                <div class="wf-step-desc">دمج التحديثات من الفرع الرئيسي</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="wf-arrow">→</div>
+
+        <div class="wf-col wf-col-github">
+          <div class="wf-col-header">◈ GitHub — على السحابة</div>
+          <ul class="wf-steps">
+            <li class="wf-step">
+              <span class="wf-step-num">01</span>
+              <div class="wf-step-body">
+                <div class="wf-step-cmd">github.com → New repository</div>
+                <div class="wf-step-desc">إنشاء مستودع جديد على المنصة</div>
+              </div>
+            </li>
+            <li class="wf-step">
+              <span class="wf-step-num">02</span>
+              <div class="wf-step-body">
+                <div class="wf-step-cmd">git remote add origin [url]</div>
+                <div class="wf-step-desc">ربط المستودع المحلي بالبعيد</div>
+              </div>
+            </li>
+            <li class="wf-step">
+              <span class="wf-step-num">03</span>
+              <div class="wf-step-body">
+                <div class="wf-step-cmd">git push origin main</div>
+                <div class="wf-step-desc">رفع الـ commits المحلية لـ GitHub</div>
+              </div>
+            </li>
+            <li class="wf-step">
+              <span class="wf-step-num">04</span>
+              <div class="wf-step-body">
+                <div class="wf-step-cmd">Pull Request → Review → Merge</div>
+                <div class="wf-step-desc">طلب مراجعة الكود ودمجه رسمياً</div>
+              </div>
+            </li>
+            <li class="wf-step">
+              <span class="wf-step-num">05</span>
+              <div class="wf-step-body">
+                <div class="wf-step-cmd">Actions → Deploy pipeline</div>
+                <div class="wf-step-desc">تشغيل CI/CD تلقائياً عند الدمج</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COMMANDS ===== -->
+  <section id="commands">
+    <div class="sec-head">
+      <span class="sec-num">05</span>
+      <h2>أوامر Git الأساسية</h2>
+    </div>
+
+    <div class="commands-wrap">
+      <div class="cmd-panel cmd-panel-git">
+        <div class="cmd-panel-header">// Setup & Init</div>
+        <ul class="cmd-list">
+          <li class="cmd-item"><span class="cmd-code">git init</span><span class="cmd-desc">تهيئة مستودع جديد في المجلد</span></li>
+          <li class="cmd-item"><span class="cmd-code">git clone [url]</span><span class="cmd-desc">استنساخ مستودع بعيد محلياً</span></li>
+          <li class="cmd-item"><span class="cmd-code">git config --global user.name</span><span class="cmd-desc">ضبط اسم المستخدم عالمياً</span></li>
+          <li class="cmd-item"><span class="cmd-code">git status</span><span class="cmd-desc">عرض حالة الملفات الحالية</span></li>
+          <li class="cmd-item"><span class="cmd-code">git log --oneline</span><span class="cmd-desc">عرض تاريخ الـ commits مختصراً</span></li>
+        </ul>
+      </div>
+      <div class="cmd-panel cmd-panel-github">
+        <div class="cmd-panel-header">// Remote & Sync</div>
+        <ul class="cmd-list">
+          <li class="cmd-item"><span class="cmd-code">git remote add origin</span><span class="cmd-desc">ربط المستودع بـ GitHub</span></li>
+          <li class="cmd-item"><span class="cmd-code">git push origin main</span><span class="cmd-desc">رفع التغييرات لـ GitHub</span></li>
+          <li class="cmd-item"><span class="cmd-code">git pull origin main</span><span class="cmd-desc">سحب آخر التغييرات من GitHub</span></li>
+          <li class="cmd-item"><span class="cmd-code">git fetch --all</span><span class="cmd-desc">جلب البيانات بدون دمج</span></li>
+          <li class="cmd-item"><span class="cmd-code">git remote -v</span><span class="cmd-desc">عرض الـ remotes المضافة</span></li>
+        </ul>
+      </div>
+      <div class="cmd-panel cmd-panel-git">
+        <div class="cmd-panel-header">// Branching & Merging</div>
+        <ul class="cmd-list">
+          <li class="cmd-item"><span class="cmd-code">git branch</span><span class="cmd-desc">عرض كل الفروع</span></li>
+          <li class="cmd-item"><span class="cmd-code">git checkout -b [name]</span><span class="cmd-desc">إنشاء فرع جديد والانتقال إليه</span></li>
+          <li class="cmd-item"><span class="cmd-code">git merge [branch]</span><span class="cmd-desc">دمج فرع في الفرع الحالي</span></li>
+          <li class="cmd-item"><span class="cmd-code">git rebase main</span><span class="cmd-desc">إعادة بناء الـ commits على main</span></li>
+          <li class="cmd-item"><span class="cmd-code">git branch -d [name]</span><span class="cmd-desc">حذف فرع بعد دمجه</span></li>
+        </ul>
+      </div>
+      <div class="cmd-panel cmd-panel-github">
+        <div class="cmd-panel-header">// Saving & Undoing</div>
+        <ul class="cmd-list">
+          <li class="cmd-item"><span class="cmd-code">git add .</span><span class="cmd-desc">تحضير كل الملفات للـ commit</span></li>
+          <li class="cmd-item"><span class="cmd-code">git commit -m "[msg]"</span><span class="cmd-desc">تسجيل التغييرات مع رسالة</span></li>
+          <li class="cmd-item"><span class="cmd-code">git stash</span><span class="cmd-desc">حفظ التغييرات مؤقتاً بدون commit</span></li>
+          <li class="cmd-item"><span class="cmd-code">git reset --soft HEAD~1</span><span class="cmd-desc">التراجع عن آخر commit</span></li>
+          <li class="cmd-item"><span class="cmd-code">git revert [hash]</span><span class="cmd-desc">عكس commit بشكل آمن</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== USE CASES ===== -->
+  <section id="usecases">
+    <div class="sec-head">
+      <span class="sec-num">06</span>
+      <h2>متى تستخدم كلاً منهما؟</h2>
+    </div>
+
+    <div class="usecases-grid">
+      <div class="usecase answer-git">
+        <div class="usecase-q">أريد حفظ نقاط تقدم في مشروعي الشخصي</div>
+        <div class="usecase-a"><strong>Git فقط</strong> يكفيك. <code>git init</code> ثم <code>git commit</code> بانتظام. لا حاجة لرفع أي شيء.</div>
+      </div>
+      <div class="usecase answer-github">
+        <div class="usecase-q">أريد التعاون مع فريق في نفس الكود</div>
+        <div class="usecase-a"><strong>Git + GitHub</strong> معاً. Git للعمل المحلي، GitHub للمشاركة والـ Pull Requests والمراجعة.</div>
+      </div>
+      <div class="usecase answer-github">
+        <div class="usecase-q">أريد نشر موقعي مجاناً</div>
+        <div class="usecase-a"><strong>GitHub Pages</strong> خيار ممتاز. ارفع الكود لـ GitHub وفعّل Pages — الموقع يعمل على <code>[user].github.io</code> مجاناً.</div>
+      </div>
+      <div class="usecase answer-git">
+        <div class="usecase-q">أعمل في بيئة بدون إنترنت</div>
+        <div class="usecase-a"><strong>Git وحده</strong> يعمل كاملاً offline. كل العمليات المحلية (commit، branch، merge) لا تحتاج اتصالاً.</div>
+      </div>
+      <div class="usecase answer-github">
+        <div class="usecase-q">أريد أتمتة الاختبارات والنشر</div>
+        <div class="usecase-a"><strong>GitHub Actions</strong> يتيح CI/CD مدمجاً. كل push يُشغّل اختبارات تلقائية ويمكن نشر التطبيق فوراً.</div>
+      </div>
+      <div class="usecase answer-both">
+        <div class="usecase-q">هل أحتاج تعلم كليهما؟</div>
+        <div class="usecase-a"><strong>نعم، لكن بترتيب.</strong> تعلم Git أولاً وأتقن الأوامر الأساسية. ثم انتقل لـ GitHub. بدون فهم Git ستظل محيراً في GitHub.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== RESOURCES ===== -->
+  <section id="resources">
+    <div class="sec-head">
+      <span class="sec-num">07</span>
+      <h2>مصادر التعلم</h2>
+    </div>
+
+    <div class="resources-grid">
+      <a href="https://git-scm.com/book/ar/v2" class="res-card" target="_blank" rel="noopener">
+        <div class="res-name">Pro Git Book (عربي)</div>
+        <div class="res-desc">الكتاب الرسمي لـ Git مترجم للعربية. المرجع الأكثر شمولاً ودقة — مجاني بالكامل.</div>
+        <span class="res-tag">git-scm.com · مجاني</span>
+      </a>
+      <a href="https://docs.github.com/ar" class="res-card" target="_blank" rel="noopener">
+        <div class="res-name">GitHub Docs (عربي)</div>
+        <div class="res-desc">التوثيق الرسمي لـ GitHub باللغة العربية. يشمل كل الميزات من Actions حتى Pages.</div>
+        <span class="res-tag">docs.github.com · رسمي</span>
+      </a>
+      <a href="https://learngitbranching.js.org/?locale=ar" class="res-card" target="_blank" rel="noopener">
+        <div class="res-name">Learn Git Branching</div>
+        <div class="res-desc">لعبة تفاعلية مرئية لتعلم Git branching بالتطبيق الفعلي. الأفضل لفهم الفروع والدمج.</div>
+        <span class="res-tag">تفاعلي · مجاني</span>
+      </a>
+      <a href="https://ohshitgit.com/ar" class="res-card" target="_blank" rel="noopener">
+        <div class="res-name">Oh Shit Git! (عربي)</div>
+        <div class="res-desc">حلول سريعة لأشيع أخطاء Git. مرجع عملي للمواقف الحرجة: "كيف أتراجع عن هذا؟"</div>
+        <span class="res-tag">عملي · مرجع سريع</span>
+      </a>
+      <a href="https://www.atlassian.com/git/tutorials" class="res-card" target="_blank" rel="noopener">
+        <div class="res-name">Atlassian Git Tutorials</div>
+        <div class="res-desc">سلسلة دروس من شركة Bitbucket. تغطي كل شيء من المبادئ حتى Workflows المتقدمة.</div>
+        <span class="res-tag">atlassian.com · شامل</span>
+      </a>
+      <a href="https://skills.github.com/" class="res-card" target="_blank" rel="noopener">
+        <div class="res-name">GitHub Skills</div>
+        <div class="res-desc">دورات تفاعلية رسمية من GitHub نفسه. تتعلم داخل مستودع حقيقي خطوة بخطوة.</div>
+        <span class="res-tag">skills.github.com · تطبيقي</span>
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left">
+      <span>Git</span> هي الأداة · <span class="gh">GitHub</span> هي المنصة<br>
+      <span style="color:var(--muted); font-size:0.78rem;">تعلم الأولى أولاً — كل شيء آخر يبنى عليها</span>
+    </div>
+    <div class="footer-right">
+      COMPILED 2025<br>
+      GIT v2.44 · GITHUB
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
